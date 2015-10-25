@@ -1,6 +1,15 @@
-# ngImgCropExtended
+## Live demo
 
-[![Bower version](https://badge.fury.io/bo/ngImgCropExtended.svg)](http://badge.fury.io/bo/ngImgCropExtended)
+[Codepen: Circle Crop](http://codepen.io/Crackeraki/pen/avYNKP)<br>
+[Codepen: Square Crop](http://codepen.io/Crackeraki/pen/QjmNVM)<br>
+[Codepen: Rectangle Crop](http://codepen.io/Crackeraki/pen/XmEdPx)<br>
+[Codepen: Rectangle With Aspect Crop](http://codepen.io/Crackeraki/pen/zvWqJM)<br>
+
+## Future Plan
+
+Add multiple image result, for example if we need small, medium and huge image size saved in the server, make that possible inside our plugin. Many people will say that we can do that on the server side, but i believe it must be done at the same place we do the resize in the first place.
+
+# ngImgCropFullExtended
 
 Simple Image Crop directive for AngularJS. Enables to crop a circle, a square or a rectangle out of an image.
 
@@ -13,10 +22,6 @@ Source image by Edgaras Maselskis
 ![Square Crop](/screenshots/square.png "Square Crop")
 
 ![Rectangle Crop](/screenshots/rectangle.png "Rectangle Crop")
-
-## Live demo
-
-[Live demo on JSFiddle](http://jsfiddle.net/vogloblinsky/dnuwmkft/6/)
 
 ## Requirements
 
@@ -42,8 +47,8 @@ Source image by Edgaras Maselskis
 ### Download
 
 You have two options to get the files:
-- [Download ngImgCropExtended](https://github.com/vogloblinsky/ngImgCropExtended/archive/master.zip) files from GitHub.
-- Use Bower to download the files. Just run `bower install ngImgCropExtended`.
+- [Download ngImgCropExtended](https://github.com/CrackerakiUA/ngImgCropExtended/archive/master.zip) files from GitHub.
+- Use Bower to download the files. Just run `bower install ngImgCropFullExtended`.
 
 ### Add files
 
@@ -140,10 +145,10 @@ The following code enables to select an image using a file input and crop it. Th
    [change-on-fly="{boolean}"]
    [area-type="{circle|square|rectangle}"]
    [area-min-size="{number}"]
-   [result-image-size="{number}"]
+   [result-image-size="{number|{w:number,h:number}}"]
    [result-image-format="{string}"]
    [result-image-quality="{number}"]
-   [force-aspect-ratio="{boolean}"]
+   [aspect-ratio="{number}"]
    [dominant-color="{string}"]
    [palette-color="{string}"]
    [palette-color-length="{number}"]
@@ -198,9 +203,9 @@ Assignable angular expression to data-bind to. NgImgCrop puts an url blob of a c
 
 *Optional*. Quality of result image. Possible values between 0.0 and 1.0 inclusive. Default: browser default.
 
-### force-aspect-ratio
+### aspect-ratio
 
-*Optional*. For square or circle area types. Maintain aspect ratio.
+*Optional*. For rectangle area type. Maintain aspect ratio by scale width/height number.
 
 ### dominant-color
 
@@ -233,5 +238,5 @@ Assignable angular expression to data-bind to. NgImgCrop puts an url blob of a c
 
 ## License
 
-See the [LICENSE](https://github.com/alexk111/vogloblinsky/blob/master/LICENSE) file.
+See the [LICENSE](https://github.com/alexk111/CrackerakiUA/blob/master/LICENSE) file.
 

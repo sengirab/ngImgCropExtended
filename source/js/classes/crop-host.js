@@ -447,11 +447,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             resImgFormat = format;
         };
 
-        this.setForceAspectRatio = function(force) {
-            forceAspectRatio = force;
-            theArea.setForceAspectRatio(force);
-        };
-
         this.setResultImageQuality = function(quality) {
             quality = parseFloat(quality);
             if (!isNaN(quality) && quality >= 0 && quality <= 1) {
@@ -480,6 +475,13 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             theArea = new AreaClass(ctx, events);
             theArea.setMinSize(curMinSize);
             theArea.setSize(curSize);
+            if (type === 'square' || type === 'circle') {
+                forceAspectRatio = true;
+                theArea.setForceAspectRatio(true);
+            }else{
+                forceAspectRatio = false;
+                theArea.setForceAspectRatio(false);
+            }
 
             //TODO: use top left point
             theArea.setCenterPoint({
@@ -527,6 +529,16 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             colorPaletteLength = lg;
         };
 
+        this.setAspect = function(aspect) {
+            theArea.setAspect(aspect);
+            var minSize = theArea.getMinSize();
+            minSize.w=minSize.h*aspect;
+            theArea.setMinSize(minSize);
+            var size = theArea.getSize();
+            size.w=size.h*aspect;
+            theArea.setSize(size);
+        };
+
         /* Life Cycle begins */
 
         // Init Context var
@@ -558,7 +570,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             elCanvas.remove();
         };
     };
-
 }]);
 
 'use strict';
