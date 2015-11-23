@@ -6,8 +6,10 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
         scope: {
             image: '=',
             resultImage: '=',
+            resultArrayImage: '=',
             resultBlob: '=',
             urlBlob: '=',
+            chargement: '=',
             
             changeOnFly: '=',
             areaCoords: '=',
@@ -29,9 +31,9 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
             onLoadError: '&'
         },
         template: '<canvas></canvas>',
-        controller: function($scope /*, $attrs, $element*/ ) {
+        controller: ['$scope', function($scope) {
             $scope.events = new CropPubSub();
-        },
+        }],
         link: function(scope, element /*, attrs*/ ) {
             // Init Events Manager
             var events = scope.events;
@@ -44,9 +46,13 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
 
             var updateResultImage = function(scope) {
                 if (scope.image !== '') {
-                    var resultImageObj = cropHost.getResultImage(),
-                        resultImage = resultImageObj.dataURI,
-                        urlCreator = window.URL || window.webkitURL;
+                    var resultImageObj = cropHost.getResultImage();
+                    if(angular.isArray(resultImageObj)){
+                        resultImage=resultImageObj[0].dataURI;
+                        scope.resultArrayImage=resultImageObj;
+                        console.log(scope.resultArrayImage);
+                    }else var resultImage = resultImageObj.dataURI;
+                    var urlCreator = window.URL || window.webkitURL;
                     if (storedResultImage !== resultImage) {
                         storedResultImage = resultImage;
                         scope.resultImage = resultImage;
@@ -87,8 +93,9 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
                 };
             };
 
+            if(scope.chargement==null) scope.chargement='Chargement';
             var displayLoading = function() {
-                element.append('<div class="loading"><span>Chargement...</span></div>')
+                element.append('<div class="loading"><span>'+scope.chargement+'...</span></div>')
             };
 
             // Setup CropHost Event Handlers

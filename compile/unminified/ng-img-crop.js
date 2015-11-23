@@ -1,11 +1,11 @@
 /*!
- * ngImgCropExtended v0.4.3
+ * ngImgCropExtended v0.4.4
  * https://github.com/CrackerakiUA/ngImgCropExtended/
  *
  * Copyright (c) 2015 undefined
  * License: MIT
  *
- * Generated at Sunday, October 25th, 2015, 3:18:30 PM
+ * Generated at Sunday, November 22nd, 2015, 8:35:25 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -1999,6 +1999,7 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             maxCanvasDims = [300, 300],
 
             // Result Image size
+            resImgSizeArray = [];
             resImgSize = {
                 w: 200,
                 h: 200
@@ -2149,9 +2150,9 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             }
         };
 
-        this.getResultImage = function() {
+        var renderImageToDataURL = function(getResultImageSize){
             var temp_ctx, temp_canvas,
-                ris = this.getResultImageSize(),
+                ris = getResultImageSize,
                 center = theArea.getCenterPoint(),
                 retObj = {
                     dataURI: null,
@@ -2162,14 +2163,42 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             temp_canvas.width = ris.w;
             temp_canvas.height = ris.h;
             if (image !== null) {
+                var x = (center.x - theArea.getSize().w / 2) * (image.width / ctx.canvas.width),
+                    y = (center.y - theArea.getSize().h / 2) * (image.height / ctx.canvas.height),
+                    areaWidth = theArea.getSize().w * (image.width / ctx.canvas.width),
+                    areaHeight = theArea.getSize().h * (image.height / ctx.canvas.height);
 
-                temp_ctx.drawImage(image, (center.x - theArea.getSize().w / 2) * (image.width / ctx.canvas.width), (center.y - theArea.getSize().h / 2) * (image.height / ctx.canvas.height),
-                    theArea.getSize().w * (image.width / ctx.canvas.width),
-                    theArea.getSize().h * (image.height / ctx.canvas.height),
-                    0,
-                    0,
-                    ris.w,
-                    ris.h);
+                if (forceAspectRatio) {
+                    temp_ctx.drawImage(image, x, y,
+                        areaWidth,
+                        areaHeight,
+                        0,
+                        0,
+                        ris.w,
+                        ris.h);
+                } else {
+                    var aspectRatio = areaWidth / areaHeight;
+                    var resultHeight, resultWidth;
+
+                    if (aspectRatio > 1) {
+                        resultWidth = ris.w;
+                        resultHeight = resultWidth / aspectRatio;
+                    } else {
+                        resultHeight = ris.h;
+                        resultWidth = resultHeight * aspectRatio;
+                    }
+
+                    temp_ctx.drawImage(image,
+                        x,
+                        y,
+                        areaWidth,
+                        areaHeight,
+                        0,
+                        0,
+                        Math.round(resultWidth),
+                        Math.round(resultHeight));
+                }
+
                 if (resImgQuality !== null) {
                     retObj.dataURI = temp_canvas.toDataURL(resImgFormat, resImgQuality);
                 } else {
@@ -2177,6 +2206,22 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                 }
             }
             return retObj;
+        }
+
+        this.getResultImage = function() {
+            if(resImgSizeArray.length==0){
+                return renderImageToDataURL(this.getResultImageSize());
+            }else{
+                var arrayResultImages=[];
+                for (var i = 0; i < resImgSizeArray.length; i++) {
+                    arrayResultImages.push({
+                        dataURI:renderImageToDataURL(resImgSizeArray[i]).dataURI,
+                        w:resImgSizeArray[i].w,
+                        h:resImgSizeArray[i].h
+                    });
+                };
+                return arrayResultImages;
+            }
         };
 
         this.getResultImageDataBlob = function() {
@@ -2189,13 +2234,41 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             temp_canvas.width = ris.w;
             temp_canvas.height = ris.h;
             if (image !== null) {
-                temp_ctx.drawImage(image, (center.x - theArea.getSize().w / 2) * (image.width / ctx.canvas.width), (center.y - theArea.getSize().h / 2) * (image.height / ctx.canvas.height),
-                    theArea.getSize().w * (image.width / ctx.canvas.width),
-                    theArea.getSize().h * (image.height / ctx.canvas.height),
-                    0,
-                    0,
-                    ris.w,
-                    ris.h);
+                var x = (center.x - theArea.getSize().w / 2) * (image.width / ctx.canvas.width),
+                    y = (center.y - theArea.getSize().h / 2) * (image.height / ctx.canvas.height),
+                    areaWidth = theArea.getSize().w * (image.width / ctx.canvas.width),
+                    areaHeight = theArea.getSize().h * (image.height / ctx.canvas.height);
+
+                if (forceAspectRatio) {
+                    temp_ctx.drawImage(image, x, y,
+                        areaWidth,
+                        areaHeight,
+                        0,
+                        0,
+                        ris.w,
+                        ris.h);
+                } else {
+                    var aspectRatio = areaWidth / areaHeight;
+                    var resultHeight, resultWidth;
+
+                    if (aspectRatio > 1) {
+                        resultWidth = ris.w;
+                        resultHeight = resultWidth / aspectRatio;
+                    } else {
+                        resultHeight = ris.h;
+                        resultWidth = resultHeight * aspectRatio;
+                    }
+
+                    temp_ctx.drawImage(image,
+                        x,
+                        y,
+                        areaWidth,
+                        areaHeight,
+                        0,
+                        0,
+                        Math.round(resultWidth),
+                        Math.round(resultHeight));
+                }
             }
             temp_canvas.toBlob(function(blob) {
                 _p.resolve(blob);
@@ -2213,6 +2286,7 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             events.trigger('image-updated');
             if (!!imageSource) {
                 var newImage = new Image();
+                newImage.crossOrigin = 'anonymous';
                 newImage.onload = function() {
                     events.trigger('load-done');
 
@@ -2355,11 +2429,17 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
         this.setAreaMinSize = function(size) {
             if (angular.isUndefined(size)) {
                 return;
+            }else if(typeof size == 'number' || typeof size == 'string'){
+                size = {
+                    w: parseInt(parseInt(size), 10),
+                    h: parseInt(parseInt(size), 10)
+                };
+            }else{
+                size = {
+                    w: parseInt(size.w, 10),
+                    h: parseInt(size.h, 10)
+                };
             }
-            size = {
-                w: parseInt(size.w, 10),
-                h: parseInt(size.h, 10)
-            };
             if (!isNaN(size.w) && !isNaN(size.h)) {
                 theArea.setMinSize(size);
                 drawScene();
@@ -2374,16 +2454,22 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
             return resImgSize;
         };
         this.setResultImageSize = function(size) {
+            if(angular.isArray(size)){
+                resImgSizeArray=size.slice();
+                size = {
+                    w: parseInt(size[0].w, 10),
+                    h: parseInt(size[0].h, 10)
+                };
+                return;
+            }
             if (angular.isUndefined(size)) {
                 return;
             }
-
             //allow setting of size to "selection" for mirroring selection's dimensions
             if (angular.isString(size)) {
                 resImgSize = size;
                 return;
             }
-
             //allow scalar values for square-like selection shapes
             if (angular.isNumber(size)) {
                 size = parseInt(size, 10);
@@ -2392,7 +2478,6 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                     h: size
                 };
             }
-
             size = {
                 w: parseInt(size.w, 10),
                 h: parseInt(size.h, 10)
@@ -2561,8 +2646,10 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
         scope: {
             image: '=',
             resultImage: '=',
+            resultArrayImage: '=',
             resultBlob: '=',
             urlBlob: '=',
+            chargement: '=',
             
             changeOnFly: '=',
             areaCoords: '=',
@@ -2584,9 +2671,9 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
             onLoadError: '&'
         },
         template: '<canvas></canvas>',
-        controller: function($scope /*, $attrs, $element*/ ) {
+        controller: ['$scope', function($scope) {
             $scope.events = new CropPubSub();
-        },
+        }],
         link: function(scope, element /*, attrs*/ ) {
             // Init Events Manager
             var events = scope.events;
@@ -2599,9 +2686,13 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
 
             var updateResultImage = function(scope) {
                 if (scope.image !== '') {
-                    var resultImageObj = cropHost.getResultImage(),
-                        resultImage = resultImageObj.dataURI,
-                        urlCreator = window.URL || window.webkitURL;
+                    var resultImageObj = cropHost.getResultImage();
+                    if(angular.isArray(resultImageObj)){
+                        resultImage=resultImageObj[0].dataURI;
+                        scope.resultArrayImage=resultImageObj;
+                        console.log(scope.resultArrayImage);
+                    }else var resultImage = resultImageObj.dataURI;
+                    var urlCreator = window.URL || window.webkitURL;
                     if (storedResultImage !== resultImage) {
                         storedResultImage = resultImage;
                         scope.resultImage = resultImage;
@@ -2642,8 +2733,9 @@ crop.directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeo
                 };
             };
 
+            if(scope.chargement==null) scope.chargement='Chargement';
             var displayLoading = function() {
-                element.append('<div class="loading"><span>Chargement...</span></div>')
+                element.append('<div class="loading"><span>'+scope.chargement+'...</span></div>')
             };
 
             // Setup CropHost Event Handlers
