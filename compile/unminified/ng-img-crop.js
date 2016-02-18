@@ -2,10 +2,10 @@
  * ngImgCropExtended v0.4.4
  * https://github.com/CrackerakiUA/ngImgCropExtended/
  *
- * Copyright (c) 2015 undefined
+ * Copyright (c) 2016 undefined
  * License: MIT
  *
- * Generated at Sunday, November 22nd, 2015, 8:35:25 PM
+ * Generated at Thursday, February 18th, 2016, 12:17:24 PM
  */
 (function() {
 var crop = angular.module('ngImgCrop', []);
@@ -2406,16 +2406,15 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
                     ratioMin = Math.min(ratioNewCurWidth, ratioNewCurHeight);
 
                 //TODO: use top left corner point
-                theArea.setSize({
-                    w: theArea.getSize().w * ratioMin,
-                    h: theArea.getSize().h * ratioMin
-                });
                 var center = theArea.getCenterPoint();
+                theArea.setSize({
+                    w: theArea.getSize().w * ratioNewCurWidth,
+                    h: theArea.getSize().h * ratioNewCurHeight
+                });
                 theArea.setCenterPoint({
                     x: center.x * ratioNewCurWidth,
                     y: center.y * ratioNewCurHeight
                 });
-
             } else {
                 elCanvas.prop('width', 0).prop('height', 0).css({
                     'margin-top': 0
@@ -2424,6 +2423,8 @@ crop.factory('cropHost', ['$document', '$q', 'cropAreaCircle', 'cropAreaSquare',
 
             drawScene();
 
+            resetCropHost();
+            events.trigger('image-updated');
         };
 
         this.setAreaMinSize = function(size) {
